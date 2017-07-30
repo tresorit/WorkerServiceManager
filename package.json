@@ -1,0 +1,27 @@
+{
+  "name": "ServiceSystem",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/bundle.umd.js",
+  "module": "lib/bundle.module.js",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Mihaly Lengyel",
+    "email": "porcellus@gmail.com",
+    "url": "github.com/porcellus/"
+  },
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "expect.js": "^0.3.1",
+    "rollup": "^0.45.2",
+    "rollup-plugin-typescript2": "^0.4.6",
+    "sinon": "^2.4.1",
+    "tslib": "^1.7.1",
+    "typescript": "^2.4.2"
+  }
+}
