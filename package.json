@@ -1,9 +1,10 @@
 {
   "name": "worker-service-manager",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "lib/bundle.umd.js",
   "module": "lib/bundle.module.js",
+  "types": "lib/types/workerServiceManager.d.ts",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "test": "mocha"

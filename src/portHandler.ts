@@ -25,9 +25,9 @@ class DeferredPromise<T> {
 }
 
 export class PortHandler {
-    callHandler: (service, method, args) => Promise<any>;
-    deferreds: Map<number, DeferredPromise<any>>;
-    nextPid: number;
+    private callHandler: (service, method, args) => Promise<any>;
+    private deferreds: Map<number, DeferredPromise<any>>;
+    private nextPid: number;
 
     constructor(private port: Port) {
         this.nextPid = 0;

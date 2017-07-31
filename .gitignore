@@ -84,6 +84,8 @@ typings/
 # Mongo Explorer plugin:
 .idea/**/mongoSettings.xml
 
+.idea/
+
 ## File-based project format:
 *.iws
 
@@ -105,3 +107,5 @@ crashlytics-build.properties
 fabric.properties
 
 .rpt2_cache/
+
+.tmp/

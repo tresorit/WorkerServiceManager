@@ -3,9 +3,10 @@
     "module": "es6",
     "target": "es6",
     "sourceMap": true,
-    "outDir": "./.tmp/",
     "importHelpers": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationDir": "./lib/types"
   },
   "exclude": [
     "node_modules"
