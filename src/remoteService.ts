@@ -6,7 +6,7 @@ export class RemoteService {
 
     }
 
-    async call(method, args) {
+    async call(method, args = []) {
         return await this.port.call(this.name, method, args);
     }
 }
