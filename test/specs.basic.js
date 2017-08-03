@@ -1,7 +1,7 @@
 const sinon = require('sinon');
 const expect = require('expect.js');
 
-const { main, RemoteService } = require("../lib/bundle.umd.js");
+const { WorkerServiceManager, RemoteService } = require("../lib/bundle.umd.js");
 
 const PortPair = require("./PortPair");
 
@@ -12,8 +12,6 @@ class TestService {
 }
 
 class TestServiceProxy extends RemoteService {
-    get name() {return "TestService"}
-
     testFunction(...args) {
         this.call("testFunction", args);
     }
@@ -25,7 +23,7 @@ describe("Passing calls", function () {
 
     beforeEach(function () {
         const portPair = new PortPair();
-        mainHandler = new main(
+        mainHandler = new WorkerServiceManager(
             new Map([
                 ["TestService", TestService]
             ]),
@@ -33,10 +31,14 @@ describe("Passing calls", function () {
         );
         mainHandler.addPort(portPair.port1);
         testServiceImpl = mainHandler.services.get("TestService");
-        leafHandler = new main(
+        leafHandler = new WorkerServiceManager(
             new Map(),
             new Map([
-                [portPair.port2, [TestServiceProxy]]
+                [
+                  portPair.port2, [
+                    ["TestService", TestServiceProxy]
+                  ]
+                ]
             ])
         );
     });

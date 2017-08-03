@@ -11,9 +11,10 @@ export class WorkerServiceManager extends ServiceMap {
         remoteServiceMap.forEach((serviceProxyTypes, port) => {
             const portHandler = this.addPort(port);
 
-            serviceProxyTypes.forEach(serviceProxyType => {
-                const proxy = new serviceProxyType(portHandler);
-                this.addServiceObject(proxy.name, proxy);
+            serviceProxyTypes.forEach(serviceProxyInfo => {
+                const proxy = new serviceProxyInfo[1](portHandler);
+                proxy.name = serviceProxyInfo[0];
+                this.addServiceObject(serviceProxyInfo[0], proxy);
             });
         });
     }
