@@ -21,3 +21,4 @@ export class WorkerServiceManager extends ServiceMap {
 }
 
 export {RemoteService} from "./remoteService";
+export {PortHandler} from "./portHandler";
