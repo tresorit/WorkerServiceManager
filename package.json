@@ -1,6 +1,6 @@
 {
   "name": "worker-service-manager",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "",
   "main": "lib/bundle.umd.js",
   "module": "lib/bundle.module.js",
