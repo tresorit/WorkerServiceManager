@@ -1,4 +1,4 @@
-import { PortHandler } from "./PortHandler";
+import { PortHandler } from "./portHandler";
 
 export class RemoteService {
   public name: string;

@@ -1,4 +1,4 @@
-import { PortHandler } from "./PortHandler";
+import { PortHandler } from "./portHandler";
 
 export class ServiceMap {
   public services: Map<string, any>;
