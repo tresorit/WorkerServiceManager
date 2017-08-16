@@ -1,0 +1,11 @@
+{
+  "extends": "tslint:recommended",
+  "jsRules": {
+    "curly": [true, "as-needed"],
+    "indent": [true, "spaces", 2]
+  },
+  "rules": {
+    "curly": [true, "as-needed"],
+    "indent": [true, "spaces"]
+  }
+}
