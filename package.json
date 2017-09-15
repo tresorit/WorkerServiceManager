@@ -1,6 +1,6 @@
 {
   "name": "worker-service-manager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "lib/bundle.umd.js",
   "module": "lib/bundle.module.js",
@@ -26,13 +26,13 @@
   "licence": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "chai": "^4.1.1",
-    "mocha": "^3.5.0",
-    "rollup": "^0.45.2",
-    "rollup-plugin-typescript2": "^0.4.6",
-    "sinon": "^2.4.1",
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3",
+    "rollup": "^0.49.3",
+    "rollup-plugin-typescript2": "^0.5.2",
+    "sinon": "^3.2.1",
     "tslib": "^1.7.1",
-    "tslint": "^5.6.0",
-    "typescript": "^2.4.2"
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2"
   }
 }

@@ -1,5 +1,6 @@
 # WorkerServiceManager
 ![Build Status](https://travis-ci.org/tresorit/WorkerServiceManager.svg?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/tresorit/WorkerServiceManager/badge.svg)](https://snyk.io/test/github/tresorit/WorkerServiceManager)
 
 A simple system that handles communication between code running in different contexts (e.g.: workers) through messages.
 
