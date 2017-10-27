@@ -70,9 +70,11 @@ export class PortHandler {
         break;
       case PortCommands.resolve:
         this.deferreds.get(ev.data[1]).resolve(ev.data[2]);
+        this.deferreds.delete(ev.data[1]);
         break;
       case PortCommands.reject:
         this.deferreds.get(ev.data[1]).reject(ev.data[2]);
+        this.deferreds.delete(ev.data[1]);
         break;
     }
   }
