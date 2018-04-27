@@ -44,9 +44,10 @@ class TestServiceProxy extends RemoteService {
 describe("Passing calls", function () {
   let mainHandler, leafHandler;
   let testServiceImpl;
+  let portPair;
 
   beforeEach(function () {
-    const portPair = new PortPair();
+    portPair = new PortPair();
     mainHandler = new WorkerServiceManager(
       new Map([
         ["TestService", TestService]
@@ -135,6 +136,29 @@ describe("Passing calls", function () {
       const retVal = leafHandler.services.get("TestService").testEcho(123);
       return expect(retVal).to.be.an.instanceof(Promise);
     })
+  });
+
+  describe('terminate', function () {
+    it('should call terminate on the port', () => {
+      portPair.port2.terminate = sinon.spy();
+
+      mainHandler.terminatePort(leafHandler.services.get("TestService").port);
+
+      expect(portPair.port2.terminate.callCount).to.equal(1);
+    });
+
+    it('should make later calls throw proper errors', async () => {
+      portPair.port2.terminate = () => {};
+
+      mainHandler.terminatePort(leafHandler.services.get("TestService").port);
+
+      try {
+        await leafHandler.services.get("TestService").testEcho(123);
+        expect.fail('Did not throw');
+      } catch (e) {
+        expect(e.message).to.equal('PortTerminated');
+      }
+    });
   });
 });
 

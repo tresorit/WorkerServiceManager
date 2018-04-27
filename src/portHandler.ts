@@ -2,6 +2,7 @@ import { DeferredPromise } from "./deferredPromise";
 
 export interface IMessagePort {
   onmessage: (event: MessageEvent) => void | Promise<void>;
+  terminate: () => void;
 
   postMessage(data: any[], transfers?: any[]);
 }
@@ -25,7 +26,16 @@ export class PortHandler {
     this.port.onmessage = this.handleMessage.bind(this);
   }
 
+  async terminate() {
+      this.port.onmessage = undefined;
+      this.port.terminate();
+      this.port = undefined; // So that the calls throw;
+  }
+
   public async call(service, method, args): Promise<any> {
+    if (!this.port)
+      throw new Error('PortTerminated');
+
     const deferred = new DeferredPromise<any>();
     const pid = this.nextPid++;
     this.deferreds.set(pid, deferred);
@@ -39,6 +49,9 @@ export class PortHandler {
   }
 
   public fire(service, method, args): void {
+    if (!this.port)
+      throw new Error('PortTerminated');
+
     this.port.postMessage([PortCommands.fire, service, method, args]);
   }
 
