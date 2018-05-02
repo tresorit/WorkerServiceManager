@@ -4,4 +4,5 @@ export declare class RemoteService {
     name: string;
     constructor(port: PortHandler);
     call(method: any, args?: any[]): Promise<any>;
+    detach(): PortHandler;
 }

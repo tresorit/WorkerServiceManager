@@ -18,28 +18,39 @@ export class PortHandler {
   private callHandler: (service, method, args) => Promise<any>;
   private deferreds: Map<number, DeferredPromise<any>>;
   private nextPid: number;
+  private port: IMessagePort;
 
-  constructor(private port: IMessagePort) {
+  constructor(private portPromise: Promise<IMessagePort> | IMessagePort) {
     this.nextPid = 0;
     this.deferreds = new Map<number, DeferredPromise<any>>();
     this.callHandler = null;
-    this.port.onmessage = this.handleMessage.bind(this);
+    if (!(this.portPromise instanceof Promise)) {
+      this.port = this.portPromise;
+      this.port.onmessage = this.handleMessage.bind(this);
+    } else this.portPromise.then((port) => {
+          this.port = port;
+          this.port.onmessage = this.handleMessage.bind(this);
+      });
   }
 
-  async terminate() {
-      this.port.onmessage = undefined;
-      this.port.terminate();
-      this.port = undefined; // So that the calls throw;
+  public async terminate() {
+      const port = this.port ? this.port : await this.portPromise;
+
+      port.onmessage = undefined;
+      port.terminate();
+
+      this.portPromise = undefined;
+      this.port = undefined;
   }
 
   public async call(service, method, args): Promise<any> {
-    if (!this.port)
-      throw new Error('PortTerminated');
-
+    if (!this.port && !this.portPromise)
+      throw new Error("PortTerminated");
+    const port = this.port ? this.port : await this.portPromise;
     const deferred = new DeferredPromise<any>();
     const pid = this.nextPid++;
     this.deferreds.set(pid, deferred);
-    this.port.postMessage([PortCommands.call, pid, service, method, args]);
+    port.postMessage([PortCommands.call, pid, service, method, args]);
     return deferred.promise;
   }
 
@@ -50,7 +61,7 @@ export class PortHandler {
 
   public fire(service, method, args): void {
     if (!this.port)
-      throw new Error('PortTerminated');
+      throw new Error("PortTerminated");
 
     this.port.postMessage([PortCommands.fire, service, method, args]);
   }

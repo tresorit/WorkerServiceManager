@@ -1,45 +1,11 @@
 const sinon = require('sinon');
 const expect = require('chai').expect;
 
-const {WorkerServiceManager, RemoteService} = require("../lib/bundle.umd.js");
+const {WorkerServiceManager} = require("../lib/bundle.umd.js");
 
-const PortPair = require("./PortPair");
-
-class TestService {
-  static testFunction(...args) {
-    console.log(args);
-  }
-
-  static testEcho(a) {
-    return a;
-  }
-
-  static testAsyncEcho(a) {
-    return Promise.resolve(a);
-  }
-
-  static testErr() {
-    throw new Error("TestError");
-  }
-}
-
-class TestServiceProxy extends RemoteService {
-  testFunction(...args) {
-    return this.call("testFunction", args);
-  }
-
-  testEcho(...args) {
-    return this.call("testEcho", args);
-  }
-
-  testAsyncEcho(...args) {
-    return this.call("testAsyncEcho", args);
-  }
-
-  testErr() {
-    return this.call("testErr");
-  }
-}
+const {TestService} = require('./res/testService');
+const {TestServiceProxy} = require('./res/testServiceProxy');
+const PortPair = require("./res/PortPair");
 
 describe("Passing calls", function () {
   let mainHandler, leafHandler;
@@ -50,7 +16,7 @@ describe("Passing calls", function () {
     portPair = new PortPair();
     mainHandler = new WorkerServiceManager(
       new Map([
-        ["TestService", TestService]
+        ["TestService", new TestService()]
       ]),
       new Map()
     );

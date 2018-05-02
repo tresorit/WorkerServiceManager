@@ -1,0 +1,112 @@
+// noinspection BadExpressionStatementJS
+
+const sinon = require('sinon');
+const expect = require('chai').expect;
+
+const {WorkerServiceManager, MultiRemoteService} = require("../lib/bundle.umd.js");
+
+const {TestService} = require('./res/testService');
+const {TestServiceProxy} = require('./res/testServiceProxy');
+const PortPair = require("./res/PortPair");
+const utils = require('./res/utils');
+
+describe('MultiRemoteService', () => {
+  let mainHandler;
+  let portFactory;
+  let testServices;
+
+  beforeEach(function () {
+    testServices = [];
+    mainHandler = new WorkerServiceManager(new Map(), new Map());
+    portFactory = sinon.stub().callsFake(() => {
+      const portPair = new PortPair();
+      const leafManager = new WorkerServiceManager(new Map(), new Map());
+      const serviceObj = new TestService();
+      testServices.push(sinon.mock(serviceObj));
+      leafManager.addServiceObject('TestService', serviceObj);
+      leafManager.addPort(portPair.port1);
+      return portPair.port2;
+    });
+  });
+
+  describe('getRemote', () => {
+    it('should produce a remote object that calls through properly', async () => {
+      const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 1);
+
+      const remote = await multiRemote.getRemote();
+
+      testServices[0].expects('testEcho', 'asdf');
+
+      await remote.testEcho('asdf');
+
+      testServices[0].verify();
+
+      expect(testServices)
+    });
+
+    it('should block if we are at max capacity', async () => {
+      const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 1);
+
+      const remote = await multiRemote.getRemote();
+
+      let secondRemote;
+      const prom = multiRemote.getRemote().then((remote) => secondRemote = remote);
+      await utils.sleep(1);
+      const f = expect(secondRemote).to.be.undefined;
+      multiRemote.releaseRemote(remote);
+      await prom;
+      const s = expect(secondRemote).to.be.ok;
+      expect(testServices).to.be.of.length(1);
+    });
+
+    it('should create new remote if we are below the max', async () => {
+      const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 2);
+
+      const remote = await multiRemote.getRemote();
+      const secondRemote = await multiRemote.getRemote();
+
+      expect(remote).to.be.ok;
+      expect(secondRemote).to.be.ok;
+      expect(testServices).to.be.of.length(2);
+    });
+  });
+
+  describe('releaseRemote', () => {
+    it('should call terminate if we are above the free worker limit', async () => {
+      const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 1);
+
+      const remote = await multiRemote.getRemote();
+      let terminateSpy = sinon.spy();
+      remote.port.port.terminate = terminateSpy;
+      multiRemote.releaseRemote(remote);
+      await utils.sleep(1);
+      expect(terminateSpy.callCount).to.equal(1);
+    });
+
+    it('should not call terminate if we are below the free worker limit', async () => {
+      const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 1, 1);
+
+      const remote = await multiRemote.getRemote();
+      let terminateSpy = sinon.spy();
+      remote.port.port.terminate = terminateSpy;
+      multiRemote.releaseRemote(remote);
+      await utils.sleep(1); // Needed because release terminates the worker async
+      expect(terminateSpy.callCount).to.equal(0);
+    });
+
+    it('should pass existing service if there is somebody waiting for a service', async () => {
+      const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 1);
+
+      const remote = await multiRemote.getRemote();
+
+      const prom = multiRemote.getRemote();
+      await utils.sleep(1);
+      multiRemote.releaseRemote(remote);
+      await prom;
+      const secondRemote = await prom;
+
+      expect(remote).to.not.equal(secondRemote);
+      expect(testServices).to.be.of.length(1);
+    });
+  });
+});

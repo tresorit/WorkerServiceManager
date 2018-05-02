@@ -4,10 +4,11 @@
   "description": "",
   "main": "lib/bundle.umd.js",
   "module": "lib/bundle.module.js",
-  "types": "lib/types/workerServiceManager.d.ts",
+  "types": "lib/workerServiceManager.d.ts",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "prepublish": "npm run build && npm test",
+    "typecheck": "tsc --noEmit",
     "lint": "tslint -c tslint.json --project tsconfig.json src/**/*.ts",
     "lint-fix": "tslint -c tslint.json --project tsconfig.json --fix src/**/*.ts",
     "test": "mocha"

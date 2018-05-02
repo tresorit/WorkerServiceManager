@@ -5,8 +5,7 @@
     "sourceMap": true,
     "importHelpers": true,
     "moduleResolution": "node",
-    "declaration": true,
-    "declarationDir": "./lib/types"
+    "declaration": true
   },
   "exclude": [
     "node_modules",

@@ -1,3 +1,5 @@
+import { PortHandler } from "./portHandler";
+import { RemoteService } from "./remoteService";
 import { ServiceMap } from "./serviceMap";
 
 export class WorkerServiceManager extends ServiceMap {
@@ -18,5 +20,6 @@ export class WorkerServiceManager extends ServiceMap {
   }
 }
 
+export { MultiRemoteService } from "./multiRemoteService";
 export { RemoteService } from "./remoteService";
 export { PortHandler } from "./portHandler";
