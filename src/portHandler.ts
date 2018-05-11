@@ -1,10 +1,12 @@
 import { DeferredPromise } from "./deferredPromise";
+import {MessageTransformer, Transferable} from "./messageTransformers/messageTransformer";
 
 export interface IMessagePort {
   onmessage: (event: MessageEvent) => void | Promise<void>;
   terminate: () => void;
 
   postMessage(data: any[], transfers?: any[]);
+  postMessage(data: any[], port: string, transfers?: any[]);
 }
 
 enum PortCommands {
@@ -20,7 +22,7 @@ export class PortHandler {
   private nextPid: number;
   private port: IMessagePort;
 
-  constructor(private portPromise: Promise<IMessagePort> | IMessagePort) {
+  constructor(private portPromise: Promise<IMessagePort> | IMessagePort, private messageTransformer: MessageTransformer, private targetOrigin?: string) {
     this.nextPid = 0;
     this.deferreds = new Map<number, DeferredPromise<any>>();
     this.callHandler = null;
@@ -46,11 +48,11 @@ export class PortHandler {
   public async call(service, method, args): Promise<any> {
     if (!this.port && !this.portPromise)
       throw new Error("PortTerminated");
-    const port = this.port ? this.port : await this.portPromise;
     const deferred = new DeferredPromise<any>();
     const pid = this.nextPid++;
     this.deferreds.set(pid, deferred);
-    port.postMessage([PortCommands.call, pid, service, method, args]);
+    const msg = this.messageTransformer.transformMessage(args);
+    await this.postMessage([PortCommands.call, pid, service, method, msg[0]], msg[1], this.targetOrigin);
     return deferred.promise;
   }
 
@@ -59,11 +61,20 @@ export class PortHandler {
     this.callHandler = handler;
   }
 
-  public fire(service, method, args): void {
-    if (!this.port)
+  public fire(service, method, args): Promise<void> {
+    if (!this.port && !this.portPromise)
       throw new Error("PortTerminated");
 
-    this.port.postMessage([PortCommands.fire, service, method, args]);
+    const msg = this.messageTransformer.transformMessage(args);
+    return this.postMessage([PortCommands.fire, service, method, msg[0]], msg[1], this.targetOrigin);
+  }
+
+  private async postMessage(msg: any, transferables: Transferable[], origin?: string) {
+    const port = this.port ? this.port : await this.portPromise;
+    if (this.targetOrigin)
+      port.postMessage(msg, this.targetOrigin, transferables);
+    else
+      port.postMessage(msg, transferables);
   }
 
   private async handleMessage(ev) {
@@ -87,9 +98,11 @@ export class PortHandler {
             ev.data[3],
             ev.data[4],
           );
-          this.port.postMessage([PortCommands.resolve, ev.data[1], res]);
+          const msg = this.messageTransformer.transformMessage(res);
+          await this.postMessage([PortCommands.resolve, ev.data[1], msg[0]], msg[1], this.targetOrigin);
         } catch (ex) {
-          this.port.postMessage([PortCommands.reject, ev.data[1], ex]);
+          const msg = this.messageTransformer.transformMessage(ex);
+          await this.postMessage([PortCommands.reject, ev.data[1], msg[0]], msg[1], this.targetOrigin);
         }
         break;
       case PortCommands.resolve:

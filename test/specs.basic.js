@@ -86,7 +86,11 @@ describe("Passing calls", function () {
         const err = new Error();
         const retVal = await leafHandler.services.get("TestService").testEcho(err);
 
-        return expect(retVal).to.deep.equal(err);
+        return expect(retVal).to.deep.equal({
+          name: err.name,
+          stack: err.stack,
+          message: err.message,
+        });
       });
 
       it("should reject with the proper error", async function () {

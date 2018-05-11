@@ -1,16 +1,18 @@
 import { PortHandler } from "./portHandler";
+import {MessageTransformer} from "./messageTransformers/messageTransformer";
+import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
 
 export class ServiceMap {
   public services: Map<string, any>;
   public ports: PortHandler[];
 
-  constructor() {
+  constructor(private messageTransformer: MessageTransformer = new DefaultMessageTransformer()) {
     this.services = new Map<string, any>();
     this.ports = [];
   }
 
   public addPort(port: any) {
-    const handler = new PortHandler(port);
+    const handler = new PortHandler(port, this.messageTransformer);
     handler.setCallHandler(this.handleCall.bind(this));
     this.ports.push(handler);
     return handler;

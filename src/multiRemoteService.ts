@@ -2,6 +2,8 @@ import {DeferredPromise} from "./deferredPromise";
 import {IMessagePort, PortHandler} from "./portHandler";
 import {RemoteService} from "./remoteService";
 import {ServiceMap} from "./serviceMap";
+import {MessageTransformer} from "./messageTransformers/messageTransformer";
+import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
 
 export class MultiRemoteService<T extends RemoteService> {
     private busyPorts: T[];
@@ -11,7 +13,9 @@ export class MultiRemoteService<T extends RemoteService> {
 
     constructor(private serviceMap: ServiceMap,
                 private portFactory: () => Promise<IMessagePort>, private proxyType: new (ph: PortHandler) => T,
-                private maxPorts: number, private minPorts: number = 0) {
+                private maxPorts: number, private minPorts: number = 0,
+                private messageTransformer: MessageTransformer = new DefaultMessageTransformer(),
+                ) {
         this.busyPorts = [];
         this.freePorts = [];
         this.queue = [];
@@ -58,7 +62,7 @@ export class MultiRemoteService<T extends RemoteService> {
     }
 
     private getNewPort() {
-        const ph = new PortHandler(this.portFactory());
+        const ph = new PortHandler(this.portFactory(), this.messageTransformer);
         ph.setCallHandler(this.serviceMap.handleCall.bind(this.serviceMap));
         return ph;
     }

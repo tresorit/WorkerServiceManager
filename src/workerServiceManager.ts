@@ -1,10 +1,12 @@
 import { PortHandler } from "./portHandler";
 import { RemoteService } from "./remoteService";
 import { ServiceMap } from "./serviceMap";
+import {MessageTransformer} from "./messageTransformers/messageTransformer";
+import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
 
 export class WorkerServiceManager extends ServiceMap {
-  constructor(localServiceMap, remoteServiceMap) {
-    super();
+  constructor(localServiceMap, remoteServiceMap, messageTransformer: MessageTransformer = new DefaultMessageTransformer()) {
+    super(messageTransformer);
 
     localServiceMap.forEach((obj, name) => this.addServiceObject(name, obj));
 
