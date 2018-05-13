@@ -1,8 +1,8 @@
-import { PortHandler } from "./portHandler";
-export declare class RemoteService {
+import { IPortHandler } from "./port/IPortHandler";
+export declare class RemoteService<PortType extends IPortHandler = IPortHandler> {
     private port;
     name: string;
-    constructor(port: PortHandler);
+    constructor(port: PortType);
     call(method: any, args?: any[]): Promise<any>;
-    detach(): PortHandler;
+    detach(): PortType;
 }

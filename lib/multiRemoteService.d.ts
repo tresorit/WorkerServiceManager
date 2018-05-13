@@ -1,7 +1,7 @@
-import { IMessagePort, PortHandler } from "./portHandler";
+import { MessageTransformer } from "./messageTransformers/messageTransformer";
+import { IMessagePort, IPortHandler } from "./port/IPortHandler";
 import { RemoteService } from "./remoteService";
 import { ServiceMap } from "./serviceMap";
-import { MessageTransformer } from "./messageTransformers/messageTransformer";
 export declare class MultiRemoteService<T extends RemoteService> {
     private serviceMap;
     private portFactory;
@@ -12,7 +12,7 @@ export declare class MultiRemoteService<T extends RemoteService> {
     private busyPorts;
     private freePorts;
     private queue;
-    constructor(serviceMap: ServiceMap, portFactory: () => Promise<IMessagePort>, proxyType: new (ph: PortHandler) => T, maxPorts: number, minPorts?: number, messageTransformer?: MessageTransformer);
+    constructor(serviceMap: ServiceMap, portFactory: () => Promise<IMessagePort>, proxyType: new (ph: IPortHandler) => T, maxPorts: number, minPorts?: number, messageTransformer?: MessageTransformer);
     spinUp(): void;
     getRemote(): Promise<T>;
     releaseRemote(remote: T): void;

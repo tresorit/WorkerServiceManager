@@ -1,18 +1,19 @@
 import {DeferredPromise} from "./deferredPromise";
-import {IMessagePort, PortHandler} from "./portHandler";
+import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
+import {MessageTransformer} from "./messageTransformers/messageTransformer";
+import {AsyncPortHandler} from "./port/AsyncPortHandler";
+import {IMessagePort, IPortHandler} from "./port/IPortHandler";
 import {RemoteService} from "./remoteService";
 import {ServiceMap} from "./serviceMap";
-import {MessageTransformer} from "./messageTransformers/messageTransformer";
-import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
 
 export class MultiRemoteService<T extends RemoteService> {
     private busyPorts: T[];
-    private freePorts: PortHandler[];
+    private freePorts: IPortHandler[];
 
-    private queue: Array<DeferredPromise<PortHandler>>;
+    private queue: Array<DeferredPromise<IPortHandler>>;
 
     constructor(private serviceMap: ServiceMap,
-                private portFactory: () => Promise<IMessagePort>, private proxyType: new (ph: PortHandler) => T,
+                private portFactory: () => Promise<IMessagePort>, private proxyType: new (ph: IPortHandler) => T,
                 private maxPorts: number, private minPorts: number = 0,
                 private messageTransformer: MessageTransformer = new DefaultMessageTransformer(),
                 ) {
@@ -27,9 +28,9 @@ export class MultiRemoteService<T extends RemoteService> {
     }
 
     public async getRemote(): Promise<T> {
-      let portHandler: PortHandler;
+      let portHandler: IPortHandler;
       if (this.busyPorts.length >= this.maxPorts) {
-          const prom = new DeferredPromise<PortHandler>();
+          const prom = new DeferredPromise<IPortHandler>();
           this.queue.push(prom);
           portHandler = await prom.promise;
       } else if (this.freePorts.length > 0)
@@ -51,7 +52,7 @@ export class MultiRemoteService<T extends RemoteService> {
         this.releasePort(portHandler);
     }
 
-    private releasePort(portHandler: PortHandler): void {
+    private releasePort(portHandler: IPortHandler): void {
         if (this.queue.length > 0) {
             const deferred = this.queue.shift();
             deferred.resolve(portHandler);
@@ -62,7 +63,7 @@ export class MultiRemoteService<T extends RemoteService> {
     }
 
     private getNewPort() {
-        const ph = new PortHandler(this.portFactory(), this.messageTransformer);
+        const ph = new AsyncPortHandler(this.portFactory(), this.messageTransformer);
         ph.setCallHandler(this.serviceMap.handleCall.bind(this.serviceMap));
         return ph;
     }

@@ -1,26 +1,37 @@
-import { PortHandler } from "./portHandler";
-import {MessageTransformer} from "./messageTransformers/messageTransformer";
 import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
+import {MessageTransformer} from "./messageTransformers/messageTransformer";
+import {AsyncPortHandler} from "./port/AsyncPortHandler";
+import {BasicPortHandler} from "./port/BasicPortHandler";
+import {IMessagePort, IPortHandler} from "./port/IPortHandler";
+import {LazyPortHandler} from "./port/LazyPortHandler";
 
 export class ServiceMap {
   public services: Map<string, any>;
-  public ports: PortHandler[];
+  public ports: IPortHandler[];
 
   constructor(private messageTransformer: MessageTransformer = new DefaultMessageTransformer()) {
     this.services = new Map<string, any>();
     this.ports = [];
   }
 
-  public addPort(port: any) {
-    const handler = new PortHandler(port, this.messageTransformer);
+  public addPort(port: IMessagePort | Promise<IMessagePort> | (() => Promise<IMessagePort>)) {
+    let handler;
+    if (typeof port === "function")
+      handler = new LazyPortHandler(port, this.messageTransformer);
+    else if (port instanceof Promise)
+      handler = new AsyncPortHandler(port, this.messageTransformer);
+    else
+      handler = new BasicPortHandler(port, this.messageTransformer);
+
     handler.setCallHandler(this.handleCall.bind(this));
     this.ports.push(handler);
     return handler;
   }
 
-  public terminatePort(handler: PortHandler): void {
-      this.ports.splice(this.ports.indexOf(handler), 1);
-      handler.terminate();
+  public terminatePort(handler: IPortHandler): void {
+    this.ports.splice(this.ports.indexOf(handler), 1);
+    // noinspection JSIgnoredPromiseFromCall
+    handler.terminate();
   }
 
   public addServiceObject(name, obj: any) {
