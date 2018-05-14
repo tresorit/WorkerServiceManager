@@ -19,7 +19,7 @@ export class LazyPortHandler extends AsyncPortHandler {
   }
 
   protected async ensurePort(): Promise<void> {
-    if (!this.port && this.portFactory)
+    if (!this.portPromise && this.portFactory)
       this.portPromise = this.portFactory();
 
     return super.ensurePort();

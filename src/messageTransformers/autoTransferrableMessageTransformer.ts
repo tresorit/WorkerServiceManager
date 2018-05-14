@@ -8,10 +8,16 @@ function transformError(err) {
   };
 }
 
-export class DefaultMessageTransformer implements MessageTransformer {
-  private transform(message: any, visited: Map<any, boolean>): [any, Transferable[], boolean] {
+export class AutoTransferrableMessageTransformer implements MessageTransformer {
+  public transformMessage(message: any): [any, Transferable[]] {
+    return this.transform(message, new Map<any, boolean>()).slice(0, 2) as [any, Transferable[]];
+  }
+
+  private transform(message: any, copies: Map<any, any>): [any, Transferable[], boolean] {
     if (message && typeof message === "object") {
-      visited.set(message, false);
+      if (copies.has(message))
+        return [copies.get(message), [], true];
+
       switch (Object.prototype.toString.call(message)) {
         case "[object ArrayBuffer]":
         case "[object Uint8Array]":
@@ -23,54 +29,51 @@ export class DefaultMessageTransformer implements MessageTransformer {
         case "[object Float32Array]":
         case "[object Float64Array]":
           if (message.buffer.byteLength === message.byteLength) {
-            visited.set(message, false);
             return [message, [message.buffer], false];
           } else {
             const copy = new message.constructor(message);
-            visited.set(message, true);
+            copies.set(message, copy);
             return [copy, [copy.buffer], true];
           }
         case "[object Array]":
-          const res = message.map((e) => this.transform(e, visited));
-          const copied = res.reduce((a, c) => a || c, false);
-          visited.set(message, copied);
-          return [copied ? res.map((a) => a[0]) : message, res.reduce((a, c) => a.concat(c[1]), []), copied];
+          const arrRes = message.map((e) => this.transform(e, copies));
+          const copiedArr = arrRes.reduce((a, c) => a || c, false);
+          const arrTransferables = arrRes.reduce((a, c) => a.concat(c[1]), []);
+
+          if (copiedArr) {
+            const copyArr = arrRes.map((a) => a[0]);
+            copies.set(message, copyArr);
+            return [copyArr, arrTransferables, true];
+          }
+          return [message, arrTransferables, false];
         case "[object Promise]":
         case "[object XMLHttpRequest]":
         case "[object Event]":
           throw new Error("CommunicationErrorNonMessageableValue");
         case "[object DOMError]":
         case "[object DOMException]":
-          visited.set(message, true);
-          return [transformError(message), [], true];
+          const copyDOMError = transformError(message);
+          copies.set(message, copyDOMError);
+          return [copyDOMError, [], true];
         default:
           if (message instanceof Error) {
-            visited.set(message, true);
-            return [transformError(message), [], true];
+            const copyError = transformError(message);
+            copies.set(message, copyError);
+            return [copyError, [], true];
           }
           const resObj = {};
           let transferrables = [];
-          let copiedObj = false;
           for (const key of Object.keys(message)) {
-            if (!key.startsWith("_") || visited.has(key)) {
-              const cRes = this.transform(message[key], visited);
+            if (!key.startsWith("_")) {
+              const cRes = this.transform(message[key], copies);
               transferrables = transferrables.concat(cRes[1]);
-              if (cRes[2]) {
-                copiedObj = true;
-                resObj[key] = copiedObj;
-              } else {
-                resObj[key] = message[key];
-              }
+              resObj[key] = cRes[0];
             }
           }
-          visited.set(message, copiedObj);
-          return [copiedObj ? resObj : message, transferrables, copiedObj];
+          copies.set(message, resObj);
+          return [resObj, transferrables, true];
       }
     }
     return [message, [], false];
-  }
-
-  public transformMessage(message: any): [any, Transferable[]] {
-    return this.transform(message, new Map<any, boolean>()).slice(0, 2) as [any, Transferable[]];
   }
 }

@@ -25,3 +25,7 @@ export class WorkerServiceManager extends ServiceMap {
 export { MultiRemoteService } from "./multiRemoteService";
 export { RemoteService } from "./remoteService";
 export { BasicPortHandler } from "./port/BasicPortHandler";
+export { AsyncPortHandler } from "./port/AsyncPortHandler";
+export { LazyPortHandler } from "./port/LazyPortHandler";
+export { DefaultMessageTransformer } from "./messageTransformers/defaultMessageTransformer";
+export { AutoTransferrableMessageTransformer } from "./messageTransformers/autoTransferrableMessageTransformer";
