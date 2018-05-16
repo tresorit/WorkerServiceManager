@@ -35,6 +35,8 @@ export class AutoTransferrableMessageTransformer implements MessageTransformer {
             copies.set(message, copy);
             return [copy, [copy.buffer], true];
           }
+      case "[object Blob]":
+          return [message, [], false];
         case "[object Array]":
           const arrRes = message.map((e) => this.transform(e, copies));
           const copiedArr = arrRes.reduce((a, c) => a || c, false);
