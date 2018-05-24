@@ -1,6 +1,6 @@
 import {DeferredPromise} from "../deferredPromise";
-import {MessageTransformer, Transferable} from "../messageTransformers/messageTransformer";
-import {IMessagePort, IPortHandler} from "./IPortHandler";
+import {IMessageTransformer, Transferable} from "../messageTransformers/IMessageTransformer";
+import {IPortHandler, IWorkerMessagePort} from "./IPortHandler";
 
 enum PortCommands {
   call,
@@ -14,13 +14,14 @@ export class BasicPortHandler implements IPortHandler {
   private deferreds: Map<number, DeferredPromise<any>>;
   private nextPid: number;
 
-  constructor(protected port: IMessagePort|null, protected messageTransformer: MessageTransformer) {
+  constructor(protected port: IWorkerMessagePort|null, protected messageTransformer: IMessageTransformer) {
     this.nextPid = 0;
     this.deferreds = new Map<number, DeferredPromise<any>>();
     this.callHandler = null;
 
-    if (this.port)
+    if (this.port) {
       this.port.onmessage = this.handleMessage.bind(this);
+    }
   }
 
   public async terminate(): Promise<void> {
@@ -56,8 +57,9 @@ export class BasicPortHandler implements IPortHandler {
   }
 
   protected async postMessage(msg: any, transferables: Transferable[]): Promise<void> {
-    if (!this.port)
+    if (!this.port) {
       throw new Error("PortTerminated");
+    }
 
     this.port.postMessage(msg, transferables);
   }

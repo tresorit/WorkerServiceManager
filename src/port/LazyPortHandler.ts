@@ -1,9 +1,9 @@
-import {MessageTransformer, Transferable} from "../messageTransformers/messageTransformer";
+import {IMessageTransformer, Transferable} from "../messageTransformers/IMessageTransformer";
 import {AsyncPortHandler} from "./AsyncPortHandler";
-import {IMessagePort} from "./IPortHandler";
+import {IWorkerMessagePort} from "./IPortHandler";
 
 export class LazyPortHandler extends AsyncPortHandler {
-  constructor(private portFactory: () => Promise<IMessagePort>, messageTransformer: MessageTransformer) {
+  constructor(private portFactory: () => Promise<IWorkerMessagePort>, messageTransformer: IMessageTransformer) {
     super(undefined, messageTransformer);
   }
 
@@ -19,8 +19,9 @@ export class LazyPortHandler extends AsyncPortHandler {
   }
 
   protected async ensurePort(): Promise<void> {
-    if (!this.portPromise && this.portFactory)
+    if (!this.portPromise && this.portFactory) {
       this.portPromise = this.portFactory();
+    }
 
     return super.ensurePort();
   }

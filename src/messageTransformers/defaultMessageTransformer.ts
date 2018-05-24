@@ -1,4 +1,4 @@
-import {MessageTransformer, Transferable} from "./messageTransformer";
+import {IMessageTransformer, Transferable} from "./IMessageTransformer";
 
 function transformError(err) {
   return {
@@ -8,15 +8,16 @@ function transformError(err) {
   };
 }
 
-export class DefaultMessageTransformer implements MessageTransformer {
+export class DefaultMessageTransformer implements IMessageTransformer {
   public transformMessage(message: any): [any, Transferable[]] {
     return [this.transform(message, new Map<any, boolean>())[0], []];
   }
 
   private transform(message: any, copies: Map<any, any>): [any, boolean] {
     if (message && typeof message === "object") {
-      if (copies.has(message))
+      if (copies.has(message)) {
         return [copies.get(message), true];
+      }
 
       switch (Object.prototype.toString.call(message)) {
         case "[object ArrayBuffer]":
@@ -30,11 +31,10 @@ export class DefaultMessageTransformer implements MessageTransformer {
         case "[object Float64Array]":
           if (message.buffer.byteLength === message.byteLength) {
             return [message, false];
-          } else {
-            const copy = new message.constructor(message);
-            copies.set(message, copy);
-            return [copy, true];
           }
+          const copy = new message.constructor(message);
+          copies.set(message, copy);
+          return [copy, true];
         case "[object Blob]":
           return [message, false];
         case "[object Array]":

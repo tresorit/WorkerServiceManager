@@ -1,27 +1,28 @@
 import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
-import {MessageTransformer} from "./messageTransformers/messageTransformer";
+import {IMessageTransformer} from "./messageTransformers/IMessageTransformer";
 import {AsyncPortHandler} from "./port/AsyncPortHandler";
 import {BasicPortHandler} from "./port/BasicPortHandler";
-import {IMessagePort, IPortHandler} from "./port/IPortHandler";
+import {IPortHandler, IWorkerMessagePort} from "./port/IPortHandler";
 import {LazyPortHandler} from "./port/LazyPortHandler";
 
 export class ServiceMap {
   public services: Map<string, any>;
   public ports: IPortHandler[];
 
-  constructor(private messageTransformer: MessageTransformer = new DefaultMessageTransformer()) {
+  constructor(private messageTransformer: IMessageTransformer = new DefaultMessageTransformer()) {
     this.services = new Map<string, any>();
     this.ports = [];
   }
 
-  public addPort(port: IMessagePort | Promise<IMessagePort> | (() => Promise<IMessagePort>)) {
+  public addPort(port: IWorkerMessagePort | Promise<IWorkerMessagePort> | (() => Promise<IWorkerMessagePort>)) {
     let handler;
-    if (typeof port === "function")
+    if (typeof port === "function") {
       handler = new LazyPortHandler(port, this.messageTransformer);
-    else if (port instanceof Promise)
+    } else if (port instanceof Promise) {
       handler = new AsyncPortHandler(port, this.messageTransformer);
-    else
+         } else {
       handler = new BasicPortHandler(port, this.messageTransformer);
+         }
 
     handler.setCallHandler(this.handleCall.bind(this));
     this.ports.push(handler);

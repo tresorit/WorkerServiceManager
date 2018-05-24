@@ -2,11 +2,11 @@
   "root": true,
   "extends": "tslint:recommended",
   "jsRules": {
-    "curly": [true, "as-needed"],
+    "curly": [true, "ignore-same-line"],
     "indent": [true, "spaces", 2]
   },
   "rules": {
-    "curly": [true, "as-needed"],
+    "curly": [true, "ignore-same-line"],
     "indent": [true, "spaces", 2],
     "no-namespace": false
   }

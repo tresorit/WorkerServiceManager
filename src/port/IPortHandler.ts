@@ -1,10 +1,15 @@
-export interface IMessagePort {
+export interface IWorkerMessagePort {
   onmessage: (event: MessageEvent) => void | Promise<void>;
   terminate: () => void;
 
-  postMessage(data: any[], transfers?: any[]);
+  postMessage(data: any, transfers?: any[]): void;
+}
 
-  postMessage(data: any[], port: string, transfers?: any[]);
+export function isPortHandler(portHandler: any): portHandler is IPortHandler {
+    return (portHandler as IPortHandler).terminate !== undefined &&
+           (portHandler as IPortHandler).setCallHandler !== undefined &&
+           (portHandler as IPortHandler).call !== undefined &&
+           (portHandler as IPortHandler).fire !== undefined;
 }
 
 export interface IPortHandler {
