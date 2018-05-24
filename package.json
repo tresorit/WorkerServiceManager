@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/bundle.umd.js",
   "module": "lib/bundle.module.js",
-  "types": "lib/workerServiceManager.d.ts",
+  "types": "lib/src/workerServiceManager.d.ts",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "prepare": "npm run build && npm test",
