@@ -1,6 +1,6 @@
-import { IMessagePort } from "../../src/port/IPortHandler";
+import { IWorkerMessagePort } from "../../src/port/IPortHandler";
 export declare class PortPair {
-    port2: IMessagePort;
-    port1: IMessagePort;
+    port2: IWorkerMessagePort;
+    port1: IWorkerMessagePort;
     constructor();
 }

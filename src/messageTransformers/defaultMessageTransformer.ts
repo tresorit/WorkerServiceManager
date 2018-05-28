@@ -63,6 +63,10 @@ export class DefaultMessageTransformer implements IMessageTransformer {
             return [copyError, true];
           }
 
+          if (message instanceof Date) {
+            return [message, false];
+          }
+
           const resObj = {};
           for (const key of Object.keys(message)) {
             if (!key.startsWith("_")) {

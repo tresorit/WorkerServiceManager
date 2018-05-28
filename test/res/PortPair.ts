@@ -1,8 +1,8 @@
-import {IMessagePort} from "../../src/port/IPortHandler";
+import {IWorkerMessagePort} from "../../src/port/IPortHandler";
 
 export class PortPair {
-  public port2: IMessagePort;
-  public port1: IMessagePort;
+  public port2: IWorkerMessagePort;
+  public port1: IWorkerMessagePort;
 
   constructor() {
     this.port1 = {

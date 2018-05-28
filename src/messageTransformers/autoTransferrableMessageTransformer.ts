@@ -63,6 +63,11 @@ export class AutoTransferrableMessageTransformer implements IMessageTransformer 
             copies.set(message, copyError);
             return [copyError, [], true];
           }
+
+          if (message instanceof Date) {
+            return [message, [], false];
+          }
+
           const resObj = {};
           let transferrables = [];
           for (const key of Object.keys(message)) {
