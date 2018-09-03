@@ -1,6 +1,6 @@
-import {IMessageTransformer, Transferable} from "../messageTransformers/IMessageTransformer";
-import {BasicPortHandler} from "./BasicPortHandler";
-import {IWorkerMessagePort} from "./IPortHandler";
+import { IMessageTransformer, Transferable } from "../messageTransformers/IMessageTransformer";
+import { BasicPortHandler } from "./BasicPortHandler";
+import { IWorkerMessagePort } from "./IPortHandler";
 
 export class AsyncPortHandler extends BasicPortHandler {
   constructor(protected portPromise: Promise<IWorkerMessagePort>, messageTransformer: IMessageTransformer) {

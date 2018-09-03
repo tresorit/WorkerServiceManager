@@ -1,11 +1,11 @@
-import {expect} from "chai";
+import { expect } from "chai";
 import * as sinon from "sinon";
 
-import {WorkerServiceManager} from "../src/workerServiceManager";
+import { WorkerServiceManager } from "../src/workerServiceManager";
 
-import {PortPair} from "./res/PortPair";
-import {TestService} from "./res/testService";
-import {TestServiceProxy} from "./res/testServiceProxy";
+import { PortPair } from "./res/PortPair";
+import { TestService } from "./res/testService";
+import { TestServiceProxy } from "./res/testServiceProxy";
 
 describe("Passing calls", () => {
   let mainHandler;
@@ -28,8 +28,8 @@ describe("Passing calls", () => {
       new Map([
         [
           portPair.port2, [
-          ["TestService", TestServiceProxy],
-        ],
+            ["TestService", TestServiceProxy],
+          ],
         ],
       ]),
     );
@@ -41,13 +41,13 @@ describe("Passing calls", () => {
 
       await mainHandler.services.get("TestService").testFunction(1);
 
-      return expect(testServiceImpl.testFunction.calledOnce).to.be.true;
+      expect(testServiceImpl.testFunction.calledOnce).to.be.true;
     });
 
     it("should return the proper values", () => {
       const retVal = mainHandler.services.get("TestService").testEcho(123);
 
-      return expect(retVal).to.equal(123);
+      expect(retVal).to.equal(123);
     });
   });
 
@@ -57,7 +57,7 @@ describe("Passing calls", () => {
 
       await leafHandler.services.get("TestService").testFunction(1);
 
-      return expect(testServiceImpl.testFunction.calledOnce).to.be.true;
+      expect(testServiceImpl.testFunction.calledOnce).to.be.true;
     });
 
     describe("Return values", () => {
@@ -69,7 +69,7 @@ describe("Passing calls", () => {
           testVals.map((val) => leafHandler.services.get("TestService").testEcho(val)),
         );
 
-        return expect(retVals).to.deep.equal(testVals);
+        expect(retVals).to.deep.equal(testVals);
       });
 
       it("should return the primitive in async calls", async () => {
@@ -80,14 +80,14 @@ describe("Passing calls", () => {
           testVals.map((val) => leafHandler.services.get("TestService").testAsyncEcho(val)),
         );
 
-        return expect(retVals).to.deep.equal(testVals);
+        expect(retVals).to.deep.equal(testVals);
       });
 
       it("should work with errors value", async () => {
         const err = new Error();
         const retVal = await leafHandler.services.get("TestService").testEcho(err);
 
-        return expect(retVal).to.deep.equal({
+        expect(retVal).to.deep.equal({
           message: err.message,
           name: err.name,
           stack: err.stack,
@@ -105,7 +105,7 @@ describe("Passing calls", () => {
 
     it("should be async", () => {
       const retVal = leafHandler.services.get("TestService").testEcho(123);
-      return expect(retVal).to.be.an.instanceof(Promise);
+      expect(retVal).to.be.an.instanceof(Promise);
     });
   });
 

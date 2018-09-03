@@ -1,4 +1,4 @@
-import {IMessageTransformer, Transferable} from "./IMessageTransformer";
+import { IMessageTransformer, Transferable } from "./IMessageTransformer";
 
 function transformError(err) {
   return {
@@ -36,6 +36,7 @@ export class DefaultMessageTransformer implements IMessageTransformer {
           copies.set(message, copy);
           return [copy, true];
         case "[object Blob]":
+        case "[object File]":
           return [message, false];
         case "[object Array]":
           const arrRes = message.map((e) => this.transform(e, copies));

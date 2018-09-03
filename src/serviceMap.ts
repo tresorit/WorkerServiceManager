@@ -1,9 +1,9 @@
-import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
-import {IMessageTransformer} from "./messageTransformers/IMessageTransformer";
-import {AsyncPortHandler} from "./port/AsyncPortHandler";
-import {BasicPortHandler} from "./port/BasicPortHandler";
-import {IPortHandler, IWorkerMessagePort} from "./port/IPortHandler";
-import {LazyPortHandler} from "./port/LazyPortHandler";
+import { DefaultMessageTransformer } from "./messageTransformers/defaultMessageTransformer";
+import { IMessageTransformer } from "./messageTransformers/IMessageTransformer";
+import { AsyncPortHandler } from "./port/AsyncPortHandler";
+import { BasicPortHandler } from "./port/BasicPortHandler";
+import { IPortHandler, IWorkerMessagePort } from "./port/IPortHandler";
+import { LazyPortHandler } from "./port/LazyPortHandler";
 
 export class ServiceMap {
   public services: Map<string, any>;
@@ -20,9 +20,9 @@ export class ServiceMap {
       handler = new LazyPortHandler(port, this.messageTransformer);
     } else if (port instanceof Promise) {
       handler = new AsyncPortHandler(port, this.messageTransformer);
-         } else {
+    } else {
       handler = new BasicPortHandler(port, this.messageTransformer);
-         }
+    }
 
     handler.setCallHandler(this.handleCall.bind(this));
     this.ports.push(handler);

@@ -1,4 +1,4 @@
-import {RemoteService} from "../../src/remoteService";
+import { RemoteService } from "../../src/remoteService";
 
 export class TestServiceProxy extends RemoteService {
   constructor(port) {

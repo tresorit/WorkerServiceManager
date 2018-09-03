@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "es2015",
     "target": "es2017",
     "sourceMap": true,
     "importHelpers": true,
     "moduleResolution": "node",
     "declaration": true,
-    "lib": ["webworker", "es7"]
+    "lib": [
+      "webworker",
+      "es7"
+    ]
   },
   "exclude": [
     "node_modules",

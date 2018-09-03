@@ -1,6 +1,6 @@
-import {IMessageTransformer, Transferable} from "../messageTransformers/IMessageTransformer";
-import {AsyncPortHandler} from "./AsyncPortHandler";
-import {IWorkerMessagePort} from "./IPortHandler";
+import { IMessageTransformer, Transferable } from "../messageTransformers/IMessageTransformer";
+import { AsyncPortHandler } from "./AsyncPortHandler";
+import { IWorkerMessagePort } from "./IPortHandler";
 
 export class LazyPortHandler extends AsyncPortHandler {
   constructor(private portFactory: () => Promise<IWorkerMessagePort>, messageTransformer: IMessageTransformer) {

@@ -1,10 +1,10 @@
-import {DeferredPromise} from "./deferredPromise";
-import {DefaultMessageTransformer} from "./messageTransformers/defaultMessageTransformer";
-import {IMessageTransformer} from "./messageTransformers/IMessageTransformer";
-import {AsyncPortHandler} from "./port/AsyncPortHandler";
-import {IWorkerMessagePort, IPortHandler} from "./port/IPortHandler";
-import {RemoteService} from "./remoteService";
-import {ServiceMap} from "./serviceMap";
+import { DeferredPromise } from "./deferredPromise";
+import { DefaultMessageTransformer } from "./messageTransformers/defaultMessageTransformer";
+import { IMessageTransformer } from "./messageTransformers/IMessageTransformer";
+import { AsyncPortHandler } from "./port/AsyncPortHandler";
+import { IWorkerMessagePort, IPortHandler } from "./port/IPortHandler";
+import { RemoteService } from "./remoteService";
+import { ServiceMap } from "./serviceMap";
 
 export class MultiRemoteService<T extends RemoteService> {
   private busyPorts: T[];
@@ -13,9 +13,9 @@ export class MultiRemoteService<T extends RemoteService> {
   private queue: Array<DeferredPromise<IPortHandler>>;
 
   constructor(private serviceMap: ServiceMap,
-              private portFactory: () => Promise<IWorkerMessagePort>, private proxyType: new (ph: IPortHandler) => T,
-              private maxPorts: number, private minPorts: number = 0,
-              private messageTransformer: IMessageTransformer = new DefaultMessageTransformer(),
+    private portFactory: () => Promise<IWorkerMessagePort>, private proxyType: new (ph: IPortHandler) => T,
+    private maxPorts: number, private minPorts: number = 0,
+    private messageTransformer: IMessageTransformer = new DefaultMessageTransformer(),
   ) {
     this.busyPorts = [];
     this.freePorts = [];

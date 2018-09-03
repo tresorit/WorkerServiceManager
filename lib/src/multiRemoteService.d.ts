@@ -16,6 +16,6 @@ export declare class MultiRemoteService<T extends RemoteService> {
     spinUp(): void;
     getRemote(): Promise<T>;
     releaseRemote(remote: T): void;
-    private releasePort(portHandler);
-    private getNewPort();
+    private releasePort;
+    private getNewPort;
 }
