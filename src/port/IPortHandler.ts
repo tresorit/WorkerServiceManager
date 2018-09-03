@@ -6,10 +6,10 @@ export interface IWorkerMessagePort {
 }
 
 export function isPortHandler(portHandler: any): portHandler is IPortHandler {
-    return (portHandler as IPortHandler).terminate !== undefined &&
-           (portHandler as IPortHandler).setCallHandler !== undefined &&
-           (portHandler as IPortHandler).call !== undefined &&
-           (portHandler as IPortHandler).fire !== undefined;
+  return (portHandler as IPortHandler).terminate !== undefined &&
+    (portHandler as IPortHandler).setCallHandler !== undefined &&
+    (portHandler as IPortHandler).call !== undefined &&
+    (portHandler as IPortHandler).fire !== undefined;
 }
 
 export interface IPortHandler {

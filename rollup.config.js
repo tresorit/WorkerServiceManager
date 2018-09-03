@@ -5,25 +5,25 @@ let pkg = require('./package.json');
 let external = Object.keys(pkg.dependencies);
 
 export default {
-  entry: './src/workerServiceManager.ts',
+  input: './src/workerServiceManager.ts',
 
   external,
 
   plugins: [
-    typescript({tsconfig: "tsconfig.json"})
+    typescript({ tsconfig: "tsconfig.json" })
   ],
 
-  targets: [
+  output: [
     {
-      dest: pkg.main,
+      file: pkg.main,
       format: 'umd',
-      moduleName: 'WorkerServiceManager',
-      sourceMap: true
+      name: 'WorkerServiceManager',
+      sourcemap: true
     },
     {
-      dest: pkg.module,
+      file: pkg.module,
       format: 'es',
-      sourceMap: true
+      sourcemap: true
     }
   ],
 }

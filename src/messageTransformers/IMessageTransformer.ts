@@ -1,4 +1,4 @@
-export type Transferable  = ArrayBuffer|ImageBitmap|MessagePort;
+export type Transferable = ArrayBuffer | ImageBitmap | MessagePort;
 
 export interface IMessageTransformer {
     transformMessage(message: any): [any, Transferable[]];

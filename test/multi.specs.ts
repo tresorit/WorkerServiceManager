@@ -1,12 +1,12 @@
-import {expect} from "chai";
+import { expect } from "chai";
 import * as sinon from "sinon";
 
-import {MultiRemoteService, WorkerServiceManager} from "../src/workerServiceManager";
+import { MultiRemoteService, WorkerServiceManager } from "../src/workerServiceManager";
 
-import {PortPair} from "./res/PortPair";
-import {TestService} from "./res/testService";
-import {TestServiceProxy} from "./res/testServiceProxy";
-import {utils} from "./res/utils";
+import { PortPair } from "./res/PortPair";
+import { TestService } from "./res/testService";
+import { TestServiceProxy } from "./res/testServiceProxy";
+import { utils } from "./res/utils";
 
 describe("MultiRemoteService", () => {
   let mainHandler;

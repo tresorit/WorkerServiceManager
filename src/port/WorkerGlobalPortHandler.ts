@@ -1,5 +1,5 @@
-import {IMessageTransformer, Transferable} from "../messageTransformers/IMessageTransformer";
-import {BasicPortHandler} from "./BasicPortHandler";
+import { IMessageTransformer, Transferable } from "../messageTransformers/IMessageTransformer";
+import { BasicPortHandler } from "./BasicPortHandler";
 
 export class WorkerGlobalPortHandler extends BasicPortHandler {
     constructor(messageTransformer: IMessageTransformer) {

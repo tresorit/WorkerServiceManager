@@ -1,6 +1,6 @@
-import {DeferredPromise} from "../deferredPromise";
-import {IMessageTransformer, Transferable} from "../messageTransformers/IMessageTransformer";
-import {IPortHandler, IWorkerMessagePort} from "./IPortHandler";
+import { DeferredPromise } from "../deferredPromise";
+import { IMessageTransformer, Transferable } from "../messageTransformers/IMessageTransformer";
+import { IPortHandler, IWorkerMessagePort } from "./IPortHandler";
 
 enum PortCommands {
   call,
@@ -14,7 +14,7 @@ export class BasicPortHandler implements IPortHandler {
   private deferreds: Map<number, DeferredPromise<any>>;
   private nextPid: number;
 
-  constructor(protected port: IWorkerMessagePort|null, protected messageTransformer: IMessageTransformer) {
+  constructor(protected port: IWorkerMessagePort | null, protected messageTransformer: IMessageTransformer) {
     this.nextPid = 0;
     this.deferreds = new Map<number, DeferredPromise<any>>();
     this.callHandler = null;

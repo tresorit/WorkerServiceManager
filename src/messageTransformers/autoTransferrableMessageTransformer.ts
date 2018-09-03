@@ -1,4 +1,4 @@
-import {IMessageTransformer, Transferable} from "./IMessageTransformer";
+import { IMessageTransformer, Transferable } from "./IMessageTransformer";
 
 function transformError(err) {
   return {
@@ -29,13 +29,14 @@ export class AutoTransferrableMessageTransformer implements IMessageTransformer 
         case "[object Int32Array]":
         case "[object Float32Array]":
         case "[object Float64Array]":
-            if (message.buffer.byteLength === message.byteLength) {
-                return [message, [message.buffer], false];
-            }
-            const copy = new message.constructor(message);
-            copies.set(message, copy);
-            return [copy, [copy.buffer], true];
-          case "[object Blob]":
+          if (message.buffer.byteLength === message.byteLength) {
+            return [message, [message.buffer], false];
+          }
+          const copy = new message.constructor(message);
+          copies.set(message, copy);
+          return [copy, [copy.buffer], true];
+        case "[object Blob]":
+        case "[object File]":
           return [message, [], false];
         case "[object Array]":
           const arrRes = message.map((e) => this.transform(e, copies));
@@ -71,11 +72,11 @@ export class AutoTransferrableMessageTransformer implements IMessageTransformer 
           const resObj = {};
           let transferrables = [];
           for (const key of Object.keys(message)) {
-              if (!key.startsWith("_")) {
-                  const cRes = this.transform(message[key], copies);
-                  transferrables = transferrables.concat(cRes[1]);
-                  resObj[key] = cRes[0];
-              }
+            if (!key.startsWith("_")) {
+              const cRes = this.transform(message[key], copies);
+              transferrables = transferrables.concat(cRes[1]);
+              resObj[key] = cRes[0];
+            }
           }
           copies.set(message, resObj);
           return [resObj, transferrables, true];

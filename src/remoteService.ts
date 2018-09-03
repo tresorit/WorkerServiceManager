@@ -3,7 +3,7 @@ import { IPortHandler } from "./port/IPortHandler";
 export class RemoteService<PortType extends IPortHandler = IPortHandler> {
     public name: string;
 
-    constructor(private port: PortType) {}
+    constructor(private port: PortType) { }
 
     public async call(method, args = []) {
         if (this.port === undefined) {

@@ -1,4 +1,4 @@
-import {IWorkerMessagePort} from "../../src/port/IPortHandler";
+import { IWorkerMessagePort } from "../../src/port/IPortHandler";
 
 export class PortPair {
   public port2: IWorkerMessagePort;
@@ -8,17 +8,17 @@ export class PortPair {
     this.port1 = {
       onmessage: null,
       postMessage: (data) => {
-        this.port2.onmessage({data} as any);
+        this.port2.onmessage({ data } as any);
       },
-      terminate: () => {},
+      terminate: () => { },
     };
 
     this.port2 = {
       onmessage: null,
       postMessage: (data) => {
-        this.port1.onmessage({data} as any);
+        this.port1.onmessage({ data } as any);
       },
-      terminate: () => {},
+      terminate: () => { },
     };
   }
 };
