@@ -5,12 +5,12 @@ export class RemoteService<PortType extends IPortHandler = IPortHandler> {
 
     constructor(private port: PortType) { }
 
-    public async call(method, args = []) {
+    public call(method, args = []) {
         if (this.port === undefined) {
             throw new Error("RemoteDetached");
         }
 
-        return await this.port.call(this.name, method, args);
+        return this.port.call(this.name, method, args);
     }
 
     public detach(): PortType {
