@@ -46,14 +46,17 @@ describe("MultiRemoteService", () => {
       const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 1);
 
       const remote = await multiRemote.getRemote();
+      let port = (remote as any).port;
 
       let secondRemote;
-      const prom = multiRemote.getRemote().then((rem) => secondRemote = rem);
+      const prom = multiRemote.getRemote().then(rem => (secondRemote = rem));
       await utils.sleep(1);
       const f = expect(secondRemote).to.be.undefined;
       multiRemote.releaseRemote(remote);
       await prom;
-      const s = expect(secondRemote).to.be.ok;
+      expect(secondRemote).to.be.ok;
+      expect(port).to.equal((secondRemote as any).port);
+
       expect(testServices).to.be.of.length(1);
     });
 
@@ -96,6 +99,7 @@ describe("MultiRemoteService", () => {
       const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 1);
 
       const remote = await multiRemote.getRemote();
+      let port = (remote as any).port;
 
       const prom = multiRemote.getRemote();
       await utils.sleep(1);
@@ -103,8 +107,68 @@ describe("MultiRemoteService", () => {
       await prom;
       const secondRemote = await prom;
 
-      expect(remote).to.not.equal(secondRemote);
+      expect(port).to.equal((secondRemote as any).port);
       expect(testServices).to.be.of.length(1);
+    });
+  });
+
+  describe("releaseRemote with no reuse", () => {
+    it("should call terminate if we are above the free worker limit", async () => {
+      const multiRemote = new MultiRemoteService(mainHandler, portFactory, TestServiceProxy, 1);
+
+      const remote = await multiRemote.getRemote();
+      const terminateSpy = sinon.spy();
+      (remote as any).port.terminate = terminateSpy;
+      multiRemote.releaseRemote(remote);
+      await utils.sleep(1);
+      expect(terminateSpy.callCount).to.equal(1);
+    });
+
+    it("should still call terminate if we are below the free worker limit and add a new one", async () => {
+      const multiRemote = new MultiRemoteService(
+        mainHandler,
+        portFactory,
+        TestServiceProxy,
+        1,
+        undefined,
+        undefined,
+        false
+      );
+
+      const remote = await multiRemote.getRemote();
+      const terminateSpy = sinon.spy();
+      (remote as any).port.terminate = terminateSpy;
+      multiRemote.releaseRemote(remote);
+      await utils.sleep(1); // Needed because release terminates the worker async
+      expect(terminateSpy.callCount).to.equal(1);
+    });
+
+    it("should pass new service even if there is somebody waiting for a service", async () => {
+      const multiRemote = new MultiRemoteService(
+        mainHandler,
+        portFactory,
+        TestServiceProxy,
+        1,
+        undefined,
+        undefined,
+        false
+      );
+
+      const remote = await multiRemote.getRemote();
+      let port = (remote as any).port;
+      const terminateSpy = sinon.spy();
+      (remote as any).port.terminate = terminateSpy;
+
+      const prom = multiRemote.getRemote();
+      await utils.sleep(1);
+      multiRemote.releaseRemote(remote);
+      await prom;
+      const secondRemote = await prom;
+
+      expect(terminateSpy.callCount).to.equal(1);
+      expect(remote).to.not.equal(secondRemote);
+      expect(port).to.not.equal((secondRemote as any).port);
+      expect(testServices).to.have.length(2);
     });
   });
 });

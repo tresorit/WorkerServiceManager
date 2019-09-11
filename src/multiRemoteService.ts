@@ -1,10 +1,10 @@
-import { DeferredPromise } from "./deferredPromise";
-import { DefaultMessageTransformer } from "./messageTransformers/defaultMessageTransformer";
-import { IMessageTransformer } from "./messageTransformers/IMessageTransformer";
-import { AsyncPortHandler } from "./port/AsyncPortHandler";
-import { IWorkerMessagePort, IPortHandler } from "./port/IPortHandler";
-import { RemoteService } from "./remoteService";
-import { ServiceMap } from "./serviceMap";
+import { DeferredPromise } from './deferredPromise';
+import { DefaultMessageTransformer } from './messageTransformers/defaultMessageTransformer';
+import { IMessageTransformer } from './messageTransformers/IMessageTransformer';
+import { AsyncPortHandler } from './port/AsyncPortHandler';
+import { IWorkerMessagePort, IPortHandler } from './port/IPortHandler';
+import { RemoteService } from './remoteService';
+import { ServiceMap } from './serviceMap';
 
 export class MultiRemoteService<T extends RemoteService> {
   private busyPorts: T[];
@@ -12,10 +12,14 @@ export class MultiRemoteService<T extends RemoteService> {
 
   private queue: Array<DeferredPromise<IPortHandler>>;
 
-  constructor(private serviceMap: ServiceMap,
-    private portFactory: () => Promise<IWorkerMessagePort>, private proxyType: new (ph: IPortHandler) => T,
-    private maxPorts: number, private minPorts: number = 0,
+  constructor(
+    private serviceMap: ServiceMap,
+    private portFactory: () => Promise<IWorkerMessagePort>,
+    private proxyType: new (ph: IPortHandler) => T,
+    private maxPorts: number,
+    private minPorts: number = 0,
     private messageTransformer: IMessageTransformer = new DefaultMessageTransformer(),
+    private reuseRemotes: boolean = true,
   ) {
     this.busyPorts = [];
     this.freePorts = [];
@@ -57,10 +61,23 @@ export class MultiRemoteService<T extends RemoteService> {
   private releasePort(portHandler: IPortHandler): void {
     if (this.queue.length > 0) {
       const deferred = this.queue.shift();
-      deferred.resolve(portHandler);
+      if (this.reuseRemotes) {
+        deferred.resolve(portHandler);
+      } else {
+        // noinspection JSIgnoredPromiseFromCall
+        portHandler.terminate();
+        deferred.resolve(this.getNewPort());
+      }
     } else if (this.freePorts.length < this.minPorts) {
-      this.freePorts.push(portHandler);
-    } else { // noinspection JSIgnoredPromiseFromCall
+      if (this.reuseRemotes) {
+        this.freePorts.push(portHandler);
+      } else {
+        // noinspection JSIgnoredPromiseFromCall
+        portHandler.terminate();
+        this.freePorts.push(this.getNewPort());
+      }
+    } else {
+      // noinspection JSIgnoredPromiseFromCall
       portHandler.terminate();
     }
   }
