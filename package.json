@@ -5,6 +5,11 @@
   "main": "lib/bundle.umd.js",
   "module": "lib/bundle.module.js",
   "types": "lib/src/workerServiceManager.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tresorit/WorkerServiceManager.git"
+  },
+  "homepage": "https://github.com/tresorit/WorkerServiceManager",
   "scripts": {
     "build": "rollup -c rollup.config.js",
     "prepare": "npm run build && npm test",
